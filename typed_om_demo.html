@@ -8,6 +8,11 @@
 
 <div id="footer">
     <div id="fps">--fps</div>
+    <select id="type-select" name="type">
+      <option value="left-top">Left-top</option>
+      <option value="translate">Translate</option>
+      <option value="translate-pre">Precalculated Translate</option>
+    </select>
     <button id="start" type="button" value="test" style="line-height:150%;"> START </button>
 </div>
 <div id="container"></div>
@@ -17,24 +22,39 @@
 <script src="http://cdnjs.cloudflare.com/ajax/libs/gsap/1.18.4/TweenLite.min.js"></script>
 <script src="dot.js"></script>
 <script src="typed_om.js"></script>
+<script src="typed_om_translate.js"></script>
+<script src="typed_om_precalculated_translate.js"></script>
 
 <script>
 
 var fpsElement = document.getElementById("fps");
 var button = document.getElementById("start");
 var container = document.getElementById("container");
+var demoSelect = document.getElementById("type-select");
 var inProgress = false;
 var durationMicros = 1200; // ms
 var dots = [];
+var rawDots = [];
 var dotQtyInput = 100;
+
+var demo = typedom_topleft;
 
 function toggle() {
   if (inProgress) {
     button.innerHTML = " START ";
-    for (var i = 0; i < dots.length; i++) {
-      typedom_demo.stop();
-    }
+    demo.stop();
   } else {
+    var oldDemo = demo;
+    if (demoSelect.value == "left-top") {
+      demo = typedom_topleft;
+    } else if (demoSelect.value == "translate") {
+      demo = typedom_translate;
+    } else {
+      demo = typedom_precalc_translate;
+    }
+    if (oldDemo != demo) {
+      deleteDots();
+    }
     if (!dots.length) {
       var centerX = jQuery(window).width() / 2;
       var centerY = (jQuery(window).height() / 2) - 30;
@@ -42,7 +62,7 @@ function toggle() {
       var radius = Math.sqrt(centerX * centerX + centerY * centerY);
       createDots(startingCSS, centerX, centerY, radius);
     }
-    typedom_demo.start(dots);
+    demo.start(dots);
 
     frames = 0;
     fpsStartTime = performance.now();
@@ -54,7 +74,6 @@ function toggle() {
 
 function createDots(startingCSS, centerX, centerY, radius) {
   var i = dotQtyInput, dot;
-  rawDots = [];
   while (--i > -1) {
     dot = document.createElement("img");
     dot.src = "https://greensock.com/js/img/dot.png";
@@ -64,8 +83,16 @@ function createDots(startingCSS, centerX, centerY, radius) {
     dot.style.cssText = startingCSS;
     container.appendChild(dot);
     rawDots.push(dot);
-    dots.push(typedom_demo.createDot(dot, centerX, centerY, radius));
+    dots.push(demo.createDot(dot, centerX, centerY, radius, durationMicros));
   }
+}
+
+function deleteDots() {
+  for (var i = 0; i < rawDots.length; i++) {
+    container.removeChild(rawDots[i]);
+  }
+  dots = [];
+  rawDots = [];
 }
 
 function updateFPS(now) {
