@@ -1,0 +1,36 @@
+<head>
+
+<style type="text/css">
+#testElement {
+  background: url(http://www.google.de/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png) no-repeat;
+  position: absolute;
+  /*
+  width: 544px;
+  height: 184px;
+  */
+}
+</style>
+
+</head>
+<body>
+
+<div id="testElement"></div>
+
+<script>
+
+var styleMap = document.getElementById("testElement").styleMap;
+
+styleMap.set('width', new CSSSimpleLength(544, 'px'));
+styleMap.set('height', new CSSSimpleLength(184, 'px'));
+
+var components = [];
+components.push(new CSSRotation(20));
+
+styleMap.set('transform', new TransformValue(components));
+
+components.push(new CSSScale(0.8, 0.3));
+styleMap.set('transform', new TransformValue(components));
+
+</script>
+
+</body>
