@@ -18,7 +18,7 @@ PrecalcDot.prototype.calculatePositions = function(fps) {
             new CSSSimpleLength(position[0], 'px'),
             new CSSSimpleLength(position[1], 'px')),
             new CSSScale(position[2], position[2])];
-      this.positions.push(new TransformValue(components));
+      this.positions.push(new CSSTransformValue(components));
     }
   }
 };

@@ -9,10 +9,13 @@
 <div id="footer">
     <div id="fps">--fps</div>
     <select id="type-select" name="type">
-      <option value="left-top">Left-top</option>
-      <option value="translate">Translate</option>
-      <option value="translate-pre">Precalculated Translate</option>
+      <option value="left-top">Typed OM - Left-top</option>
+      <option value="translate">Typed OM - Translate</option>
+      <option value="translate-pre">Typed OM - Precalculated Translate</option>
+      <option value="string-topleft">String - Top Left</option>
+      <option value="string-transform">String - Translate</option>
     </select>
+    <input type="number" id="num-dots" value="1000"></input>
     <button id="start" type="button" value="test" style="line-height:150%;"> START </button>
 </div>
 <div id="container"></div>
@@ -24,6 +27,8 @@
 <script src="typed_om.js"></script>
 <script src="typed_om_translate.js"></script>
 <script src="typed_om_precalculated_translate.js"></script>
+<script src="string_om.js"></script>
+<script src="string_om_translate.js"></script>
 
 <script>
 
@@ -35,7 +40,6 @@ var inProgress = false;
 var durationMicros = 1200; // ms
 var dots = [];
 var rawDots = [];
-var dotQtyInput = 100;
 
 var demo = typedom_topleft;
 
@@ -45,23 +49,29 @@ function toggle() {
     demo.stop();
   } else {
     var oldDemo = demo;
-    if (demoSelect.value == "left-top") {
-      demo = typedom_topleft;
-    } else if (demoSelect.value == "translate") {
-      demo = typedom_translate;
-    } else {
-      demo = typedom_precalc_translate;
+    switch(demoSelect.value) {
+      case 'left-top':
+        demo = typedom_topleft;
+        break;
+      case 'translate':
+        demo = typedom_translate;
+        break;
+      case 'translate-pre':
+        demo = typedom_precalc_translate;
+        break;
+      case 'string-topleft':
+        demo = string_om_topleft;
+        break;
+      case 'string-transform':
+        demo = string_om_transform;
+        break;
     }
-    if (oldDemo != demo) {
-      deleteDots();
-    }
-    if (!dots.length) {
-      var centerX = jQuery(window).width() / 2;
-      var centerY = (jQuery(window).height() / 2) - 30;
-      var startingCSS = "position:absolute; left:" + centerX + "px; top:" + centerY + "px; width:1px; height:1px;"; 
-      var radius = Math.sqrt(centerX * centerX + centerY * centerY);
-      createDots(startingCSS, centerX, centerY, radius);
-    }
+    deleteDots();
+    var centerX = jQuery(window).width() / 2;
+    var centerY = (jQuery(window).height() / 2) - 30;
+    var startingCSS = "position:absolute; left:" + centerX + "px; top:" + centerY + "px; width:1px; height:1px;"; 
+    var radius = 100 + Math.sqrt(centerX * centerX + centerY * centerY);
+    createDots(startingCSS, centerX, centerY, radius);
     demo.start(dots);
 
     frames = 0;
@@ -73,9 +83,9 @@ function toggle() {
 }
 
 function createDots(startingCSS, centerX, centerY, radius) {
-  var i = dotQtyInput, dot;
-  while (--i > -1) {
-    dot = document.createElement("img");
+  var numDots = Math.floor(Number(document.getElementById('num-dots').value));
+  for (var i = 0; i < numDots; i++) {
+    var dot = document.createElement("img");
     dot.src = "https://greensock.com/js/img/dot.png";
     dot.width = 1;
     dot.height = 1;
