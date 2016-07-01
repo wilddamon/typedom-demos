@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<head>
+  <style>
+    .dot {
+      border: 2px solid #000;
+      position: absolute;
+      left: 50%;
+      top: 50%;
+    }
+  </style>
+</head>
+<body>
+  <div id="control">
+    <button id="start">Start</button>
+    <div id="string">
+    </div>
+    <div id="typedom">
+    </div>
+    <div id="typedom-precalc">
+    </div>
+  </div>
+  <div id="content"></div>
+
+  <script>
+
+var numElements = 5000;
+var iterations = 100;
+
+var phases = ['string', 'typedom', 'typedom-precalc'];
+
+var elements = [];
+var containerElement = document.getElementById("content");
+var center = [document.documentElement.clientWidth/2, document.documentElement.clientHeight / 2];
+var numStepsPerRotation = 60 * 2;
+var angleStep = 2 * Math.PI / numStepsPerRotation;
+
+// Temporarily work around V8 regression.
+var CSS = {};
+CSS.TransformValue = CSSTransformValue;
+CSS.Translation = CSSTranslation;
+CSS.SimpleLength = CSSSimpleLength;
+
+var setPositionsFns = {
+  'string': function(elements) {
+    for (var i = 0; i < elements.length; i++) {
+      var element = elements[i];
+      element[0].style.transform = 'translate(' + element[3] + 'px, ' + element[4] + 'px)';
+    }
+  },
+  'typedom': function(elements) {
+    for (var element of elements) {
+      element[0].styleMap.set('transform',
+          new CSS.TransformValue([new CSS.Translation(
+              new CSS.SimpleLength(element[3], 'px'),
+              new CSS.SimpleLength(element[4], 'px'))]));
+    }
+  },
+  'typedom-precalc': function(elements) {
+    for (var element of elements) {
+      element[0].styleMap.set('transform', element[5])
+    }
+  }
+};
+
+function setup() {
+  for (var i = 0; i < numElements; i++) {
+    var el = document.createElement('div');
+    el.className = "dot";
+    containerElement.appendChild(el);
+
+    var angle = Math.random() * Math.PI * 2;
+    var radius = Math.random() * Math.min(center[0], center[1]) - 50;
+    elements.push([el, radius, angle, center[0], center[1]]);
+  }
+}
+
+function calculatePosition(el) {
+  var radius = el[1];
+  el[2] = el[2] + angleStep;
+
+  var x = radius * Math.cos(el[2]);
+  var y = radius * Math.sin(el[2]);
+  el[3] = x;
+  el[4] = y;
+  el[5] = new CSS.TransformValue([new CSS.Translation(
+              new CSS.SimpleLength(el[3], 'px'),
+              new CSS.SimpleLength(el[4], 'px'))]);
+}
+
+function calcSingleStats(times) {
+  var sum = 0;
+  for (var time of times) {
+    sum += time;
+  }
+  var average = sum / times.length;
+
+  var variances = [];
+  for (var time of times) {
+    variances.push(Math.pow(time - average, 2));
+  }
+  sum = 0;
+  for (var variance of variances) {
+    sum += variance;
+  }
+  times.sort();
+  var middle = times.length / 2;
+  if (middle % 2 == 0) {
+    var median = times[middle];
+  } else {
+    var median = (times[Math.floor(middle)] + times[Math.ceil(middle)]) / 2;
+  }
+  var stddev = Math.sqrt(sum / variances.length);
+  console.log('min: ' + times[0]);
+  console.log('max: ' + times[times.length - 1]);
+  console.log('mean: ' + average);
+  console.log('median: ' + median);
+  console.log('stddev: ' + stddev);
+}
+
+function calculateStats(times) {
+  for (var phase of phases) {
+    console.log(phase);
+    calcSingleStats(times[phase]);
+  }
+}
+
+function start() {
+  setup();
+
+  var setPositionFn = setPositionsFns[phases[0]];
+  var currentPhase = 0;
+
+  var numFrames = 0;
+  var times = {};
+  for (var phase of phases) {
+    times[phase] = [];
+  }
+
+  function frame() {
+    for (var i = 0; i < elements.length; i++) {
+      calculatePosition(elements[i]);
+    }
+    var start = performance.now();
+    setPositionFn(elements);
+    times[phases[currentPhase]].push(performance.now() - start);
+    if (++numFrames < iterations) {
+      window.requestAnimationFrame(frame);
+    } else {
+      currentPhase += 1;
+      numFrames = 0;
+      setPositionsFn = setPositionsFns[phases[currentPhase]];
+      if (setPositionsFn) {
+        window.requestAnimationFrame(frame);
+      } else {
+        calculateStats(times);
+      }
+    }
+  }
+  window.requestAnimationFrame(frame);
+}
+
+document.getElementById("start").addEventListener("click", start);
+
+  </script>
+</body>
