@@ -74,15 +74,17 @@ function setup() {
   }
 }
 
-function calculatePosition(el) {
+function calculatePosition(el, phase ) {
   var radius = el[1];
   el[2] = el[2] + angleStep;
 
   el[3] = radius * Math.cos(el[2]); // x
   el[4] = radius * Math.sin(el[2]); // y
-  el[5] = new CSS.TransformValue([new CSS.Translation(
-              new CSS.SimpleLength(el[3], 'px'),
-              new CSS.SimpleLength(el[4], 'px'))]);
+  if (phase == 'typedom-precalc') {
+    el[5] = new CSS.TransformValue([new CSS.Translation(
+        new CSS.SimpleLength(el[3], 'px'),
+        new CSS.SimpleLength(el[4], 'px'))]);
+  }
 }
 
 function calcSingleStats(times) {
@@ -138,7 +140,7 @@ function start() {
 
   function frame() {
     for (var i = 0; i < elements.length; i++) {
-      calculatePosition(elements[i]);
+      calculatePosition(elements[i], phases[currentPhase]);
     }
     var start = performance.now();
     setPosFn(elements);
