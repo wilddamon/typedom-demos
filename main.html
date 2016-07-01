@@ -48,7 +48,8 @@ var setPositionsFns = {
     }
   },
   'typedom': function(elements) {
-    for (var element of elements) {
+    for (var i = 0; i < elements.length; i++) {
+      var element = elements[i];
       element[0].styleMap.set('transform',
           new CSS.TransformValue([new CSS.Translation(
               new CSS.SimpleLength(element[3], 'px'),
@@ -56,7 +57,8 @@ var setPositionsFns = {
     }
   },
   'typedom-precalc': function(elements) {
-    for (var element of elements) {
+    for (var i = 0; i < elements.length; i++) {
+      var element = elements[i];
       element[0].styleMap.set('transform', element[5])
     }
   }
