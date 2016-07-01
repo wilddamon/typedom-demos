@@ -1,3 +1,5 @@
+# Benchmarks for Typed OM
+
 This demo tests the performance of the Typed OM vs the old stringy OM
 
 To run it, the CSSTypedOM runtime flag needs to be enabled.
@@ -16,28 +18,29 @@ bunch of elements, and translate them to new positions in each frame.
 
 The string demo uses old style OM methods, for example:
 
-element.style.transform = "translate(" + x + "px, " + y + "px)";
+`element.style.transform = "translate(" + x + "px, " + y + "px)";`
 
 
 The typedom demo uses new Typed OM objects, and creates new objects
 within the timed function, for example:
 
+```
 element.styleMap.set('transform', new CSSTransformValue([
     new CSSTranslation(
         new CSSTranslation(
             new CSSSimpleLength(x, 'px'),
             new CSSSimpleLength(y, 'px')))]));
-
+```
 
 The typedom-precalc demo uses Typed OM objects, but the construction
 of them does not occur within the timed loop, for example:
 
-element.styleMap.set('transform', precalculatedTransform);
+`element.styleMap.set('transform', precalculatedTransform);`
 
 
 Results will be printed in the dev console. They will look something
 like this:
-
+```
 string
 min: 10.029999999999745
 max: 9.984999999998763
@@ -56,4 +59,4 @@ max: 9.99500000000262
 mean: 12.30570000000007
 median: 12.114999999997963
 stddev: 4.046367755160128
-
+```
