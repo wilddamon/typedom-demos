@@ -24,7 +24,7 @@
   <script>
 
 var numElements = 5000;
-var iterations = 100;
+var iterations = 50;
 
 var phases = ['string', 'typedom', 'typedom-precalc'];
 
@@ -78,10 +78,8 @@ function calculatePosition(el) {
   var radius = el[1];
   el[2] = el[2] + angleStep;
 
-  var x = radius * Math.cos(el[2]);
-  var y = radius * Math.sin(el[2]);
-  el[3] = x;
-  el[4] = y;
+  el[3] = radius * Math.cos(el[2]); // x
+  el[4] = radius * Math.sin(el[2]); // y
   el[5] = new CSS.TransformValue([new CSS.Translation(
               new CSS.SimpleLength(el[3], 'px'),
               new CSS.SimpleLength(el[4], 'px'))]);
@@ -102,7 +100,7 @@ function calcSingleStats(times) {
   for (var variance of variances) {
     sum += variance;
   }
-  times.sort();
+  times.sort(function(a, b) { return a - b; });
   var middle = times.length / 2;
   if (middle % 2 == 0) {
     var median = times[middle];
@@ -125,10 +123,12 @@ function calculateStats(times) {
 }
 
 function start() {
-  setup();
+  if (!elements.length) {
+    setup();
+  }
 
-  var setPositionFn = setPositionsFns[phases[0]];
   var currentPhase = 0;
+  var setPosFn = setPositionsFns[phases[currentPhase]];
 
   var numFrames = 0;
   var times = {};
@@ -141,15 +141,15 @@ function start() {
       calculatePosition(elements[i]);
     }
     var start = performance.now();
-    setPositionFn(elements);
+    setPosFn(elements);
     times[phases[currentPhase]].push(performance.now() - start);
     if (++numFrames < iterations) {
       window.requestAnimationFrame(frame);
     } else {
       currentPhase += 1;
       numFrames = 0;
-      setPositionsFn = setPositionsFns[phases[currentPhase]];
-      if (setPositionsFn) {
+      setPosFn = setPositionsFns[phases[currentPhase]];
+      if (setPosFn) {
         window.requestAnimationFrame(frame);
       } else {
         calculateStats(times);
