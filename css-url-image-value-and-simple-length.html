@@ -16,27 +16,24 @@ var fn = [
 var element = document.createElement('div');
 document.documentElement.append(element);
 
-var numOfOperations = [1, 10, 100, 1000, 10000, 100000];
+var n = 10000;
 
-for (var op = 0; op < numOfOperations.length; ++op) {
-  var n = numOfOperations[op];
-  var sum = [0, 0, 0, 0];
-  for (var trial = 0; trial < 100; ++trial) {
-    for (var f = 0; f < 4; ++f) {
-      var start = performance.now();
-      for (var i = 0; i < n; ++i) {
-        fn[f][1]();
-      }
-      sum[f] += performance.now() - start;
-    }
-  }
-  console.log("for number of operations = " + n + ":");
+var sum = [0, 0, 0, 0];
+for (var trial = 0; trial < 100; ++trial) {
   for (var f = 0; f < 4; ++f) {
-    console.log("avg time " + fn[f][0] + " = " + (sum[f] / 100));
+    var start = performance.now();
+    for (var i = 0; i < n; ++i) {
+      fn[f][1]();
+    }
+    sum[f] += performance.now() - start;
   }
-
-  console.log("ratio of image " + (sum[0] / sum[1]));
-  console.log("ratio of length " + (sum[2] / sum[3]));
 }
+console.log("for number of operations = " + n + ":");
+for (var f = 0; f < 4; ++f) {
+  console.log("avg time " + fn[f][0] + " = " + (sum[f] / 100));
+}
+
+console.log("ratio of image " + (sum[0] / sum[1]));
+console.log("ratio of length " + (sum[2] / sum[3]));
 
 </script>
