@@ -35,13 +35,6 @@ var url = (function() {
   return c.join('/');
 })();
 
-var fn = [
-  ["image with CSS OM", function() {  }],
-  ["image with CSS Typed OM", function() {  }],
-  ["length with CSS OM", function() { element.style.width = "10px"; }],
-  ["length with CSS Typed OM", function() { element.styleMap.set("width", new CSSSimpleLength(10, 'px')); }]
-];
-
 var element = document.createElement('div');
 document.documentElement.append(element);
 
