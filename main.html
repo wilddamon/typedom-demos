@@ -10,86 +10,133 @@
   </style>
 </head>
 <body>
-  <div id="control">
-    <button id="start">Start</button>
-    <div id="string">
-    </div>
-    <div id="typedom">
-    </div>
-    <div id="typedom-precalc">
-    </div>
-  </div>
   <div id="content"></div>
 
   <script>
 
-var numElements = 5000;
-var iterations = 100;
+var numElements = 1000;
+var iterations = 10;
 
 var phases = ['string', 'typedom', 'typedom-precalc'];
 
-var elements = [];
 var containerElement = document.getElementById("content");
 var center = [document.documentElement.clientWidth/2, document.documentElement.clientHeight / 2];
-var numStepsPerRotation = 60 * 2;
-var angleStep = 2 * Math.PI / numStepsPerRotation;
+var angleStep = 2 * Math.PI / 120; // 120 steps per rotation
 
-// Temporarily work around V8 regression.
-var CSS = {};
-CSS.TransformValue = CSSTransformValue;
-CSS.Translation = CSSTranslation;
-CSS.SimpleLength = CSSSimpleLength;
+var elements = [];
+// each entry will be array of angles for each element.
+var precalculatedAngles = [];
+// Each entry will be an array of strings for each element.
+var precalculatedStrings = [];
+// Each entry will be an array of CSSTransformValues for each element.
+var precalculatedTransforms = [];
 
-var setPositionsFns = {
-  'string': function(elements) {
-    for (var i = 0; i < elements.length; i++) {
-      var element = elements[i];
-      element[0].style.transform = 'translate(' + element[3] + 'px, ' + element[4] + 'px)';
-    }
-  },
-  'typedom': function(elements) {
-    for (var i = 0; i < elements.length; i++) {
-      var element = elements[i];
-      element[0].styleMap.set('transform',
-          new CSS.TransformValue([new CSS.Translation(
-              new CSS.SimpleLength(element[3], 'px'),
-              new CSS.SimpleLength(element[4], 'px'))]));
-    }
-  },
-  'typedom-precalc': function(elements) {
-    for (var i = 0; i < elements.length; i++) {
-      var element = elements[i];
-      element[0].styleMap.set('transform', element[5])
-    }
+function calculateXY(radius, angle) {
+  return [
+    radius * Math.cos(angle), // x
+    radius * Math.sin(angle), // y
+  ];
+}
+
+function calculateAnglesForElement() {
+  var radius = Math.random() * Math.min(center[0], center[1]) - 50;
+  var angle = Math.random() * Math.PI * 2;
+  var result = [];
+  for (var i = 0; i < iterations; ++i) {
+    result.push(calculateXY(radius, angle));
+    angle += angleStep;
   }
-};
+  return result;
+}
 
-function setup() {
-  for (var i = 0; i < numElements; i++) {
-    var el = document.createElement('div');
-    el.className = "dot";
-    containerElement.appendChild(el);
-
-    var angle = Math.random() * Math.PI * 2;
-    var radius = Math.random() * Math.min(center[0], center[1]) - 50;
-    elements.push([el, radius, angle, center[0], center[1]]);
+function precalculateStrings() {
+  for (var j = 0; j < numElements; ++j) {
+    var angles = precalculatedAngles[j];
+    precalculatedStrings.push([]);
+    for (var i = 0; i < angles.length; ++i) {
+      var position = angles[i];
+      precalculatedStrings[j].push(
+          'translate(' + position[0] + 'px, ' + position[1] + 'px)');
+    }
   }
 }
 
-function calculatePosition(el, phase ) {
-  var radius = el[1];
-  el[2] = el[2] + angleStep;
-
-  el[3] = radius * Math.cos(el[2]); // x
-  el[4] = radius * Math.sin(el[2]); // y
-  if (phase == 'typedom-precalc') {
-    el[5] = new CSS.TransformValue([new CSS.Translation(
-        new CSS.SimpleLength(el[3], 'px'),
-        new CSS.SimpleLength(el[4], 'px'))]);
+function precalculateTransforms() {
+  for (var j = 0; j < numElements; ++j) {
+    var angles = precalculatedAngles[j];
+    precalculatedTransforms.push([]);
+    for (var i = 0; i < angles.length; ++i) {
+      var position = angles[i];
+      precalculatedTransforms[j].push(
+          new CSSTransformValue([new CSSTranslation(
+              new CSSSimpleLength(position[0], 'px'),
+              new CSSSimpleLength(position[1], 'px'))]));
+    }
   }
 }
 
-function calcSingleStats(times) {
+// Get set up.
+for (var i = 0; i < numElements; i++) {
+  var el = document.createElement('div');
+  el.className = "dot";
+  containerElement.appendChild(el);
+  elements.push(el);
+  for (var j = 0; j < iterations; ++j) {
+    precalculatedAngles.push(calculateAnglesForElement());
+  }
+}
+
+var allTimes = {};
+
+// Do strings that haven't been precalculated.
+var times = allTimes['string'] = [];
+for (var i = 0; i < iterations; ++i) {
+  var start = performance.now();
+  for (var j = 0; j < numElements; ++j) {
+    var position = precalculatedAngles[j][i];
+    elements[j].style.transform =
+      'translate(' + position[0] + 'px, ' + position[1] + 'px)';
+  }
+  times.push(performance.now() - start);
+}
+
+// Do strings that have been precalculated.
+times = allTimes['precalc-string'] = [];
+precalculateStrings();
+for (var i = 0; i < iterations; ++i) {
+  var start = performance.now();
+  for (var j = 0; j < numElements; ++j) {
+    elements[j].style.transform = precalculatedStrings[j][i];
+  }
+  times.push(performance.now() - start);
+}
+
+// Do Typed OM without precalculation
+times = allTimes['typedom'] = [];
+for (var i = 0; i < iterations; ++i) {
+  var start = performance.now();
+  for (var j = 0; j < numElements; ++j) {
+    var position = precalculatedAngles[j][i];
+    elements[j].styleMap.set('transform',
+        new CSSTransformValue([new CSSTranslation(
+            new CSSSimpleLength(position[0], 'px'),
+            new CSSSimpleLength(position[1], 'px'))]));
+  }
+  times.push(performance.now() - start);
+}
+
+// Do Typed OM with precalculation.
+times = allTimes['precalc-typedom'] = [];
+precalculateTransforms();
+for (var i = 0; i < iterations; ++i) {
+  var start = performance.now();
+  for (var j = 0; j < numElements; ++j) {
+    elements[j].styleMap.set('transform', precalculatedTransforms[j][i]);
+  }
+  times.push(performance.now() - start);
+}
+
+function calcStats(times) {
   var sum = 0;
   for (var time of times) {
     sum += time;
@@ -119,51 +166,10 @@ function calcSingleStats(times) {
   console.log('stddev: ' + stddev);
 }
 
-function calculateStats(times) {
-  for (var phase of phases) {
-    console.log(phase);
-    calcSingleStats(times[phase]);
-  }
+for (var type in allTimes) {
+  console.log('Stats for ' + type);
+  calcStats(allTimes[type]);
 }
-
-function start() {
-  if (!elements.length) {
-    setup();
-  }
-
-  var currentPhase = 0;
-  var setPosFn = setPositionsFns[phases[currentPhase]];
-
-  var numFrames = 0;
-  var times = {};
-  for (var phase of phases) {
-    times[phase] = [];
-  }
-
-  function frame() {
-    for (var i = 0; i < elements.length; i++) {
-      calculatePosition(elements[i], phases[currentPhase]);
-    }
-    var start = performance.now();
-    setPosFn(elements);
-    times[phases[currentPhase]].push(performance.now() - start);
-    if (++numFrames < iterations) {
-      window.requestAnimationFrame(frame);
-    } else {
-      currentPhase += 1;
-      numFrames = 0;
-      setPosFn = setPositionsFns[phases[currentPhase]];
-      if (setPosFn) {
-        window.requestAnimationFrame(frame);
-      } else {
-        calculateStats(times);
-      }
-    }
-  }
-  window.requestAnimationFrame(frame);
-}
-
-document.getElementById("start").addEventListener("click", start);
 
   </script>
 </body>
