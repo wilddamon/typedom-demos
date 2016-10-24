@@ -1,0 +1,67 @@
+
+<!DOCTYPE html>
+<style>
+  .dot {
+    border: 2px solid #000;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+  }
+</style>
+
+<div id="containerElement"></div>
+
+<script>
+
+var numElements = 1000;
+var iterations = 500;
+
+var elements = [];
+
+var width = document.documentElement.clientWidth - 5;
+var height = document.documentElement.clientHeight;
+for (var i = 0; i < numElements; i++) {
+  var el = document.createElement('div');
+  el.className = "dot";
+  containerElement.appendChild(el);
+
+  var initialX = Math.random() * width;
+  var initialY = Math.random() * height;
+  el.style.top = initialY + 'px';
+  elements.push([el, initialX]);
+}
+
+// Actually run the test.
+var numFrames = 0;
+var times = [];
+function frame() {
+  var start = performance.now();
+  for (var i = 0; i < elements.length; i++) {
+    var el = elements[i];
+
+    el[1] = (el[1] + 1) % width;
+
+    //el[0].styleMap.set('left', new CSSSimpleLength(el[1], 'px'));
+    //el[0].styleMap.set('left', new SimpleLength(el[1], 'px'), true);
+    el[0].style['left'] = el[1] + 'px';
+  }
+  times.push(performance.now() - start);
+  gc();
+  if (++numFrames < iterations) {
+    window.requestAnimationFrame(frame);
+  } else {
+    finish();
+  }
+}
+window.requestAnimationFrame(frame);
+
+function finish() {
+  var sum = 0;
+  for (var i = 0; i < numFrames; ++i) {
+    sum += times[i];
+  }
+  console.log("av " + sum/numFrames);
+  console.log("Max " + Math.max.apply(null, times));
+  console.log("min " + Math.min.apply(null, times));
+}
+</script>
