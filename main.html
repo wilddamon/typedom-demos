@@ -86,7 +86,6 @@ for (var i = 0; i < numElements; i++) {
 
 var allTimes = {};
 
-/*
 // Do strings that haven't been precalculated.
 var times = allTimes['string'] = [];
 for (var i = 0; i < iterations; ++i) {
@@ -109,7 +108,7 @@ for (var i = 0; i < iterations; ++i) {
   }
   times.push(performance.now() - start);
 }
-*/
+
 // Do Typed OM without precalculation
 times = allTimes['typedom'] = [];
 for (var i = 0; i < iterations; ++i) {
@@ -123,7 +122,7 @@ for (var i = 0; i < iterations; ++i) {
   }
   times.push(performance.now() - start);
 }
-/*
+
 // Do Typed OM with precalculation.
 times = allTimes['precalc-typedom'] = [];
 precalculateTransforms();
@@ -169,7 +168,6 @@ for (var type in allTimes) {
   console.log('Stats for ' + type);
   calcStats(allTimes[type]);
 }
-*/
 
   </script>
 </body>
