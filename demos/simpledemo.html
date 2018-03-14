@@ -18,18 +18,18 @@
 
 <script>
 
-var styleMap = document.getElementById("testElement").styleMap;
+var styleMap = document.getElementById("testElement").attributeStyleMap;
 
-styleMap.set('width', new CSSSimpleLength(544, 'px'));
-styleMap.set('height', new CSSSimpleLength(184, 'px'));
+styleMap.set('width', new CSSUnitValue(544, 'px'));
+styleMap.set('height', new CSSUnitValue(184, 'px'));
 
 var components = [];
-components.push(new CSSRotation(20));
+components.push(new CSSRotate(new CSSUnitValue(20, "deg")));
 
-styleMap.set('transform', new TransformValue(components));
+styleMap.set('transform', new CSSTransformValue(components));
 
 components.push(new CSSScale(0.8, 0.3));
-styleMap.set('transform', new TransformValue(components));
+styleMap.set('transform', new CSSTransformValue(components));
 
 </script>
 

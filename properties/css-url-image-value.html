@@ -55,7 +55,7 @@ for (var trial = 0; trial < 100; ++trial) {
   {
     var start = performance.now();
     for (var i = 0; i < n; ++i) {
-      element.styleMap.set("background-image", new CSSURLImageValue(url));
+      element.attributeStyleMap.set("background-image", new CSSURLImageValue(url));
     }
     typedOM.push(performance.now() - start);
   }

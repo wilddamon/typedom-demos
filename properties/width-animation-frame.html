@@ -41,8 +41,8 @@ function frame() {
 
     el[1] = (el[1] + 1) % width;
 
-    //el[0].styleMap.set('left', new CSSSimpleLength(el[1], 'px'));
-    //el[0].styleMap.set('left', new SimpleLength(el[1], 'px'), true);
+    //el[0].attributeStyleMap.set('left', new CSSUnitValue(el[1], 'px'));
+    //el[0].attributeStyleMap.set('left', new CSSUnitValue(el[1], 'px'), true);
     el[0].style['left'] = el[1] + 'px';
   }
   times.push(performance.now() - start);

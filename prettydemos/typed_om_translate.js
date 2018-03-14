@@ -6,11 +6,11 @@ TranslateDot.prototype.constructor = TranslateDot;
 
 TranslateDot.prototype.setPosition = function(position) {
   var components = [
-    new CSSTranslation(
-      new CSSSimpleLength(position[0], 'px'),
-      new CSSSimpleLength(position[1], 'px')),
+    new CSSTranslate(
+      new CSSUnitValue(position[0], 'px'),
+      new CSSUnitValue(position[1], 'px')),
     new CSSScale(position[2], position[2])];
-  this.element.styleMap.set('transform', new CSSTransformValue(components));
+  this.element.attributeStyleMap.set('transform', new CSSTransformValue(components));
 };
 
 typedom_translate = {

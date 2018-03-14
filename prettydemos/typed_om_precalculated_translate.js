@@ -14,9 +14,9 @@ PrecalcDot.prototype.calculatePositions = function(fps) {
     var position = this.calculatePositionOffset(i);
     if (position) {
       var components = [
-        new CSSTranslation(
-            new CSSSimpleLength(position[0], 'px'),
-            new CSSSimpleLength(position[1], 'px')),
+        new CSSTranslate(
+            new CSSUnitValue(position[0], 'px'),
+            new CSSUnitValue(position[1], 'px')),
             new CSSScale(position[2], position[2])];
       this.positions.push(new CSSTransformValue(components));
     }
@@ -25,7 +25,7 @@ PrecalcDot.prototype.calculatePositions = function(fps) {
 
 PrecalcDot.prototype.setPosition = function(position) {
   var position = this.positions[this.index++];
-  this.element.styleMap.set('transform', position);
+  this.element.attributeStyleMap.set('transform', position);
 };
 
 PrecalcDot.prototype.done = function(now) {
