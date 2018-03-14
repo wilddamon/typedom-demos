@@ -48,7 +48,7 @@ for (var trial = 0; trial < 100; ++trial) {
   {
     var start = performance.now();
     for (var i = 0; i < n; ++i) {
-      element.styleMap.set("width", new CSSSimpleLength(10, "px"));
+      element.attributeStyleMap.set("width", new CSSUnitValue(10, "px"));
     }
     typedOM.push(performance.now() - start);
   }

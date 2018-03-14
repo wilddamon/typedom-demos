@@ -6,10 +6,10 @@ TopLeftDot.prototype.constructor = TopLeftDot;
 
 TopLeftDot.prototype.setPosition = function(position) {
   var size = position[2];
-  this.element.styleMap.set('left', new CSSSimpleLength(this.centerX + position[0], 'px'));
-  this.element.styleMap.set('top', new CSSSimpleLength(this.centerY + position[1], 'px'));
-  this.element.styleMap.set('width', new CSSSimpleLength(size, 'px'));
-  this.element.styleMap.set('height', new CSSSimpleLength(size, 'px'));
+  this.element.attributeStyleMap.set('left', new CSSUnitValue(this.centerX + position[0], 'px'));
+  this.element.attributeStyleMap.set('top', new CSSUnitValue(this.centerY + position[1], 'px'));
+  this.element.attributeStyleMap.set('width', new CSSUnitValue(size, 'px'));
+  this.element.attributeStyleMap.set('height', new CSSUnitValue(size, 'px'));
 };
 
 typedom_topleft = {
@@ -46,4 +46,3 @@ typedom_topleft = {
     }
   },
 };
-

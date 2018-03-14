@@ -46,10 +46,10 @@ function frame() {
     el[3] = radius * Math.cos(el[2]); // x
     el[4] = radius * Math.sin(el[2]); // y
 
-    el[0].styleMap.set('transform',
-      new CSSTransformValue([new CSSTranslation(
-        new CSSSimpleLength(el[3], 'px'),
-        new CSSSimpleLength(el[4], 'px'))]));
+    el[0].attributeStyleMap.set('transform',
+      new CSSTransformValue([new CSSTranslate(
+        new CSSUnitValue(el[3], 'px'),
+        new CSSUnitValue(el[4], 'px'))]));
     //el[0].style.transform = "translate(" + el[3] + "px, " + el[4] + "px)";
   }
   times.push(performance.now() - start);

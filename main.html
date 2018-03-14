@@ -66,9 +66,9 @@ function precalculateTransforms() {
     for (var i = 0; i < angles.length; ++i) {
       var position = angles[i];
       precalculatedTransforms[j].push(
-          new CSSTransformValue([new CSSTranslation(
-              new CSSSimpleLength(position[0], 'px'),
-              new CSSSimpleLength(position[1], 'px'))]));
+          new CSSTransformValue([new CSSTranslate(
+              new CSSUnitValue(position[0], 'px'),
+              new CSSUnitValue(position[1], 'px'))]));
     }
   }
 }
@@ -115,10 +115,10 @@ for (var i = 0; i < iterations; ++i) {
   var start = performance.now();
   for (var j = 0; j < numElements; ++j) {
     var position = precalculatedAngles[j][i];
-    elements[j].styleMap.set('transform',
-        new CSSTransformValue([new CSSTranslation(
-            new CSSSimpleLength(position[0], 'px'),
-            new CSSSimpleLength(position[1], 'px'))]));
+    elements[j].attributeStyleMap.set('transform',
+        new CSSTransformValue([new CSSTranslate(
+            new CSSUnitValue(position[0], 'px'),
+            new CSSUnitValue(position[1], 'px'))]));
   }
   times.push(performance.now() - start);
 }
@@ -129,7 +129,7 @@ precalculateTransforms();
 for (var i = 0; i < iterations; ++i) {
   var start = performance.now();
   for (var j = 0; j < numElements; ++j) {
-    elements[j].styleMap.set('transform', precalculatedTransforms[j][i]);
+    elements[j].attributeStyleMap.set('transform', precalculatedTransforms[j][i]);
   }
   times.push(performance.now() - start);
 }

@@ -47,15 +47,15 @@ function frame() {
     var y = radius * Math.sin(el[2]); // y
 
     positions.push(
-      new CSSTransformValue([new CSSTranslation(
-        new CSSSimpleLength(x, 'px'),
-        new CSSSimpleLength(y, 'px'))]));
+      new CSSTransformValue([new CSSTranslate(
+        new CSSUnitValue(x, 'px'),
+        new CSSUnitValue(y, 'px'))]));
     //positions.push("translate(" + x + "px, " + y + "px)");
   }
   var start = performance.now();
   for (var i = 0; i < elements.length; i++) {
     var el = elements[i];
-    el[0].styleMap.set('transform', positions[i]);
+    el[0].attributeStyleMap.set('transform', positions[i]);
     //el[0].style.transform = positions[i];
   }
   times.push(performance.now() - start);

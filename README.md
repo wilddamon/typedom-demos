@@ -28,18 +28,18 @@ The typedom demo uses new Typed OM objects, and creates new objects
 within the timed function, for example:
 
 ```javascript
-element.styleMap.set('transform', new CSSTransformValue([
-    new CSSTranslation(
-        new CSSTranslation(
-            new CSSSimpleLength(x, 'px'),
-            new CSSSimpleLength(y, 'px')))]));
+element.attributeStyleMap.set('transform', new CSSTransformValue([
+    new CSSTranslate(
+        new CSSTranslate(
+            new CSSUnitValue(x, 'px'),
+            new CSSUnitValue(y, 'px')))]));
 ```
 
 The typedom-precalc demo uses Typed OM objects, but the construction
 of them does not occur within the timed loop, for example:
 
 ```javascript
-element.styleMap.set('transform', precalculatedTransform);
+element.attributeStyleMap.set('transform', precalculatedTransform);
 ```
 
 
